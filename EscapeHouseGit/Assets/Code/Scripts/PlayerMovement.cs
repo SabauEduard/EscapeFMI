@@ -1,19 +1,23 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    Rigidbody rigidBody;
-    public float speed = 10.0f;
+    Vector3 Vec;
+    // Start is called before the first frame update  
     void Start()
     {
-        rigidBody = GetComponent<Rigidbody>();
+
     }
 
+    // Update is called once per frame  
     void Update()
     {
-        float xMove = Input.GetAxis("Horizontal");
-        float zMove = Input.GetAxis("Vertical");
-
-        rigidBody.velocity = new Vector3(xMove * speed, rigidBody.velocity.y, zMove * speed);
+        Vec = transform.localPosition;
+        Vec.y += Input.GetAxis("Jump") * Time.deltaTime * 20;
+        Vec.x += Input.GetAxis("Horizontal") * Time.deltaTime * 20;
+        Vec.z += Input.GetAxis("Vertical") * Time.deltaTime * 20;
+        transform.localPosition = Vec;
     }
 }

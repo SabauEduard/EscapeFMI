@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class PlayerInteractionsController : MonoBehaviour
 {
     public Transform head;
+    public TextMeshProUGUI pickUpText;
 
     public float itemPickupDistance;
 
@@ -15,6 +17,15 @@ public class PlayerInteractionsController : MonoBehaviour
     {
         RaycastHit hit;
         bool cast = Physics.Raycast(head.position, head.forward, out hit, itemPickupDistance);
+
+        if (cast && hit.transform.CompareTag("CanBePickedUp"))
+        {
+            pickUpText.enabled = true;
+        }
+        else
+        {
+            pickUpText.enabled = false;
+        }
 
         if (Input.GetKeyDown(KeyCode.F))
         {

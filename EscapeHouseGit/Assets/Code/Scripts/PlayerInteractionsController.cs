@@ -12,6 +12,7 @@ public class PlayerInteractionsController : MonoBehaviour
 
     Transform pickedUpItem = null;
     float pickedUpItemDistance = 0f;
+    Transform previousItem = null;
 
     void Update()
     {
@@ -20,11 +21,23 @@ public class PlayerInteractionsController : MonoBehaviour
 
         if (cast && hit.transform.CompareTag("CanBePickedUp"))
         {
-            pickUpText.enabled = true;
+            previousItem = hit.transform;
+
+            pickUpText.GetComponent<TMP_Text>().enabled = true;
+
+            if (hit.transform.GetComponent<Outline>() != null)
+            {
+                hit.transform.GetComponent<Outline>().enabled = true;
+            }
         }
-        else
+        else if (previousItem != null)
         {
-            pickUpText.enabled = false;
+            pickUpText.GetComponent<TMP_Text>().enabled = false;
+            
+            if (previousItem.GetComponent<Outline>() != null)
+            {
+                previousItem.GetComponent<Outline>().enabled = false;
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.F))

@@ -5,95 +5,73 @@ using TMPro;
 
 public class PlayerInteractionsController : MonoBehaviour
 {
-    public Transform head;
+    public Transform playerHead;
+    public Transform playerHand;
     public TextMeshProUGUI pickUpText;
 
-    public float itemPickupDistance;
+    [SerializeField] private float itemPickupDistance = 5f;
 
-    Transform pickedUpItem = null;
-    float pickedUpItemDistance = 0f;
-    Transform previousItem = null;
+    private Transform pickedItem = null;
+    private Transform targetedItem = null;
 
     void Update()
     {
         RaycastHit hit;
-        bool cast = Physics.Raycast(head.position, head.forward, out hit, itemPickupDistance);
+        bool cast = Physics.Raycast(playerHead.position, playerHead.forward, out hit, itemPickupDistance);
 
-        if (cast && hit.transform.CompareTag("CanBePickedUp"))
+        if (cast && hit.transform.CompareTag("CanBePickedUp"))  // hovering interactable object
         {
-            previousItem = hit.transform;
+            targetedItem = hit.transform;
 
             pickUpText.GetComponent<TMP_Text>().enabled = true;
 
-            if (hit.transform.GetComponent<Outline>() != null)
-            {
+            if (hit.transform.GetComponent<Outline>() != null && pickedItem == null)
                 hit.transform.GetComponent<Outline>().enabled = true;
-            }
         }
-        else if (previousItem != null)
+        else if (targetedItem != null)  // exit hovering interactable object
         {
             pickUpText.GetComponent<TMP_Text>().enabled = false;
             
-            if (previousItem.GetComponent<Outline>() != null)
-            {
-                previousItem.GetComponent<Outline>().enabled = false;
-            }
+            if (targetedItem.GetComponent<Outline>() != null)
+                targetedItem.GetComponent<Outline>().enabled = false;
         }
 
-        if (Input.GetKeyDown(KeyCode.F))
+        if (Input.GetKeyDown(KeyCode.F))    
         {
-            // Debug.Log("F key was pressed");
-
-            if (pickedUpItem != null)
+            if (pickedItem != null)     // drop held item
             {
-                pickedUpItem.SetParent(null);
+                pickedItem.SetParent(null);
 
-                if (pickedUpItem.GetComponent<Rigidbody>() != null)
-                {
-                    pickedUpItem.GetComponent<Rigidbody>().isKinematic = false;
-                }
+                if (pickedItem.GetComponent<Rigidbody>() != null)
+                    pickedItem.GetComponent<Rigidbody>().isKinematic = false;
 
-                if (pickedUpItem.GetComponent<Collider>() != null)
-                {
-                    pickedUpItem.GetComponent<Collider>().enabled = true;
-                }
+                if (pickedItem.GetComponent<Collider>() != null)
+                    pickedItem.GetComponent<Collider>().enabled = true;
 
-                pickedUpItem = null;
+                pickedItem = null;
             }
-            else if (cast)
+            else if (cast)  // try picking item up
             {
-                // Debug.Log("F key was pressed and hit something");
-
                 Debug.Log(hit.transform.name);
 
                 if (hit.transform.CompareTag("CanBePickedUp"))
                 {
-                    // Debug.Log("F key was pressed and hit something that can be picked up");
 
-                    pickedUpItem = hit.transform;
-                    pickedUpItem.SetParent(transform);
+                    pickedItem = hit.transform;
+                    pickedItem.SetParent(playerHand);         // setParent(camera) to follow camera
+                    pickedItem.localScale = Vector3.one * 2f;
+                    pickedItem.position = playerHand.position;
+                    Quaternion relativeRotation = Quaternion.Euler(playerHand.rotation.eulerAngles + new Vector3(0f, -15f, 90f));
+                    pickedItem.rotation = relativeRotation;
 
-                    pickedUpItemDistance = Vector3.Distance(head.position, pickedUpItem.position);
+                    if (pickedItem.GetComponent<Rigidbody>() != null)
+                        pickedItem.GetComponent<Rigidbody>().isKinematic = true;
 
-                    if (pickedUpItem.GetComponent<Rigidbody>() != null)
-                    {
-                        pickedUpItem.GetComponent<Rigidbody>().isKinematic = true;
-                    }
-
-                    if (pickedUpItem.GetComponent<Collider>() != null)
-                    {
-                        pickedUpItem.GetComponent<Collider>().enabled = false;
-                    }
+                    if (pickedItem.GetComponent<Collider>() != null)
+                        pickedItem.GetComponent<Collider>().enabled = false;
                 }
             }
         }
     }
 
-    void LateUpdate()
-    {
-        if (pickedUpItem != null)
-        {
-            pickedUpItem.position = head.position + head.forward * pickedUpItemDistance;
-        }
-    }
 }

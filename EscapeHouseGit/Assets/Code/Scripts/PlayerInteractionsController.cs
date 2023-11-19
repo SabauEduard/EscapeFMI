@@ -56,13 +56,11 @@ public class PlayerInteractionsController : MonoBehaviour
 
                 if (hit.transform.CompareTag("CanBePickedUp"))
                 {
-
                     pickedItem = hit.transform;
+
                     pickedItem.SetParent(playerHand);         // setParent(camera) to follow camera
-                    pickedItem.localScale = Vector3.one * 2f;
                     pickedItem.position = playerHand.position;
-                    Quaternion relativeRotation = Quaternion.Euler(playerHand.rotation.eulerAngles + new Vector3(0f, -15f, 90f));
-                    pickedItem.rotation = relativeRotation;
+                    pickedItem.rotation = Quaternion.Euler(playerHand.rotation.eulerAngles + new Vector3(0f, -15f, 90f));   // align to hand + offset so object is facing forward
 
                     if (pickedItem.GetComponent<Rigidbody>() != null)
                         pickedItem.GetComponent<Rigidbody>().isKinematic = true;

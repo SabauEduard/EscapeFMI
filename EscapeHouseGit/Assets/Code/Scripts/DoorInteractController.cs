@@ -81,8 +81,8 @@ public class DoorInteractController : MonoBehaviour
                         return;
                     }
                 }
+                Debug.Log("Door is now unlocked!");                            
                 isLocked = false;
-                OpenDoor();
             }
 
         }

@@ -15,7 +15,7 @@ public class PlayerInteractionsController : MonoBehaviour
     private Vector3 initialPosition;     // initial position of held item
     private Quaternion initialRotation;   // initial rotation of held item
     private Transform initialParent = null;          // initial parent of held item
-    
+
     private Transform targetedItem = null;
 
     void Update()
@@ -31,14 +31,14 @@ public class PlayerInteractionsController : MonoBehaviour
 
             
 
-            if (hit.transform.GetComponent<Outline>() != null && pickedItem == null)
+            if (hit.transform.GetComponent<Outline>() != null && pickedItem == null)    // if not holding item, highlight interactable object
             {
                 pickUpText.GetComponent<TMP_Text>().enabled = true;
                 hit.transform.GetComponent<Outline>().enabled = true;
             }
                 
         }
-        else if (targetedItem != null)  // if stopped hovering interactable object
+        else if (targetedItem != null)  
         {
             pickUpText.GetComponent<TMP_Text>().enabled = false;
             
@@ -52,46 +52,48 @@ public class PlayerInteractionsController : MonoBehaviour
         {
             if (pickedItem != null)     // drop held item
             {
-
-                Debug.Log(pickedItem.position);
-                Debug.Log(initialPosition);  
                 pickedItem.SetParent(initialParent);
-                Debug.Log(pickedItem.position);
                 pickedItem.position = initialPosition;
-                Debug.Log(pickedItem.position);
                 pickedItem.rotation = initialRotation;
-
-              //  if (pickedItem.GetComponent<Rigidbody>() != null)
-                //    pickedItem.GetComponent<Rigidbody>().isKinematic = false;
-
-             //   if (pickedItem.GetComponent<Collider>() != null
-              //      && pickedItem.GetComponent<Collider>().enabled == false)
-              //      pickedItem.GetComponent<Collider>().enabled = true;
-
                 pickedItem = null;
             }
             else if (cast)  // try picking item up
             {
-
                 if (hit.collider.gameObject.GetComponent<PickableObjectTag>())
                 {
+
                     pickedItem = hit.transform;
-                    initialPosition = pickedItem.position;
+                    initialPosition = pickedItem.position;      // save initial state
                     initialRotation = pickedItem.rotation;
                     initialParent = hit.transform.parent;
 
-                    pickedItem.SetParent(playerHand);         // setParent(camera) to follow camera
+                    GetHeldKeyNumber();
+
+                    pickedItem.SetParent(playerHand);         // ALTERNATIVE: setParent(camera) to follow camera
                     pickedItem.position = playerHand.position;
                     pickedItem.rotation = Quaternion.Euler(playerHand.rotation.eulerAngles + new Vector3(0f, -15f, 90f));   // align to hand + offset so object is facing forward
-
-                   // if (pickedItem.GetComponent<Rigidbody>() != null)
-                     //   pickedItem.GetComponent<Rigidbody>().isKinematic = true;
-
-                  //  if (pickedItem.GetComponent<Collider>() != null)
-                     //   pickedItem.GetComponent<Collider>().enabled = false;
                 }
             }
         }
+    }
+
+    public int GetHeldKeyNumber()
+    {
+        if(!pickedItem)
+            return -1;
+
+        GameObject obj = pickedItem.gameObject;
+        if(!obj.GetComponent<KeyTag>())
+            return -1;
+        
+        string objectName = obj.name;
+        int keyNumber;
+        if(int.TryParse(objectName[objectName.Length - 1].ToString(), out keyNumber))
+        {
+            Debug.Log(keyNumber);
+            return keyNumber;
+        }
+        else return -1;
     }
 
 }

@@ -36,9 +36,9 @@ public class DoorInteractController : MonoBehaviour
     {
         
         PlayerInteractionsController player = FindObjectOfType<PlayerInteractionsController>();
-        if (player != null && player.getHeldKeyNumber() != null)
+        if (player != null && player.GetHeldKeyNumber() != -1)
         {
-            int keyNumber = player.getHeldKeyNumber();
+            int keyNumber = player.GetHeldKeyNumber();
             if (_usedKeys.Contains(keyNumber))
             {
                 Debug.Log("You have already used this key!");

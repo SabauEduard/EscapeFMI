@@ -1,18 +1,31 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using UnityEditor.ShaderGraph.Internal;
 using UnityEditor.UI;
 using UnityEngine;
 
 public class DoorInteractController : MonoBehaviour
 {
     public bool isOpen = false;
+    public bool isLocked = true;
     private List<int> _usedKeys = new List<int>();
     private List<int> _correctKeys = new List<int> {2, 5, 6};
+    public float maxInteractDistance = 5.0f;
+    private PlayerInteractionsController _player = null;
+
+
+    private void Start()
+    {
+        _player = FindObjectOfType<PlayerInteractionsController>();
+    }
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.F))
+        RaycastHit hit;
+        bool cast = Physics.Raycast(_player.playerHead.position, _player.playerHead.forward, out hit, maxInteractDistance);
+
+        if (Input.GetKeyDown(KeyCode.F) && cast && hit.collider.gameObject.GetComponent<DoorTag>())
         {
             if (isOpen)
             {
@@ -20,7 +33,10 @@ public class DoorInteractController : MonoBehaviour
             }
             else
             {
-                TryOpenDoor();
+                if (isLocked)
+                    TryOpenDoor();
+                else
+                    OpenDoor();
             }
         }
     }
@@ -29,16 +45,21 @@ public class DoorInteractController : MonoBehaviour
     {
         _usedKeys.Clear();
         isOpen = false;
-        StartCoroutine(RotateDoor(270));
+        StartCoroutine(RotateDoor(0));
+    }
+
+    void OpenDoor()
+    {
+        isOpen = true;
+        StartCoroutine(RotateDoor(90));
     }
 
     void TryOpenDoor()
     {
         
-        PlayerInteractionsController player = FindObjectOfType<PlayerInteractionsController>();
-        if (player != null && player.GetHeldKeyNumber() != -1)
+        if (_player != null && _player.GetHeldKeyNumber() != -1)
         {
-            int keyNumber = player.GetHeldKeyNumber();
+            int keyNumber = _player.GetHeldKeyNumber();
             if (_usedKeys.Contains(keyNumber))
             {
                 Debug.Log("You have already used this key!");
@@ -46,6 +67,7 @@ public class DoorInteractController : MonoBehaviour
             }
             if (_usedKeys.Count < 3)
             {
+                Debug.Log("Used key " + keyNumber);
                 _usedKeys.Add(keyNumber);
             }
             if (_usedKeys.Count == 3)
@@ -59,8 +81,8 @@ public class DoorInteractController : MonoBehaviour
                         return;
                     }
                 }
-                isOpen = true;
-                StartCoroutine(RotateDoor(360));
+                isLocked = false;
+                OpenDoor();
             }
 
         }

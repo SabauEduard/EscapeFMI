@@ -50,12 +50,24 @@ public class PlayerInteractionsController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.F))    
         {
-            if (pickedItem != null)     // drop held item
+            if (pickedItem != null) 
             {
-                pickedItem.SetParent(initialParent);
-                pickedItem.position = initialPosition;
-                pickedItem.rotation = initialRotation;
-                pickedItem = null;
+                if (pickedItem.GetComponent<KeyTag>() != null)
+                {
+                    if (cast && hit.collider.gameObject.GetComponent<KeyHangerTag>() != null)
+                    {
+                        // put key back to hanger
+                        pickedItem.SetParent(initialParent);
+                        pickedItem.position = initialPosition;
+                        pickedItem.rotation = initialRotation;
+                        pickedItem = null;
+                    }               
+                }
+                else
+                {
+                    // drop held item
+                    pickedItem.SetParent(null);
+                }
             }
             else if (cast)  // try picking item up
             {

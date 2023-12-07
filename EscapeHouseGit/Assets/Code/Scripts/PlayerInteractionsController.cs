@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-using UnityEditor.Experimental.GraphView;
 
 public class PlayerInteractionsController : MonoBehaviour
 {
@@ -22,7 +21,6 @@ public class PlayerInteractionsController : MonoBehaviour
     private Transform initialParent = null;          // initial parent of held item
 
     private Transform targetedItem = null;
-    private Transform _previousTargetedItem = null;
 
     private void DisableTexts()
     {
@@ -40,18 +38,15 @@ public class PlayerInteractionsController : MonoBehaviour
         {
             if(targetedItem != null && targetedItem != hit.transform && targetedItem.GetComponent<Outline>() != null)   // exit hovering previous interactable object
                 targetedItem.GetComponent<Outline>().enabled = false;
-            targetedItem = hit.transform;
-
-            if (_previousTargetedItem == null)
-                _previousTargetedItem = targetedItem;
-            else
-                if (targetedItem != _previousTargetedItem)
-                    DisableTexts();
+            targetedItem = hit.transform;      
 
             if (hit.transform.GetComponent<Outline>() != null) // if interactable object has outline script
             {
-                if (hit.collider.gameObject.GetComponent<PickableObjectTag>() != null && pickedItem == null)             
-                    pickUpText.GetComponent<TMP_Text>().enabled = true;
+                if (hit.collider.gameObject.GetComponent<PickableObjectTag>() != null)
+                {
+                    if (pickedItem == null)
+                        pickUpText.GetComponent<TMP_Text>().enabled = true;
+                }                   
                 else // text for any other interactable
                     interactText.GetComponent<TMP_Text>().enabled = true;
 
@@ -93,7 +88,7 @@ public class PlayerInteractionsController : MonoBehaviour
                         pickedItem.position = initialPosition;
                         pickedItem.rotation = initialRotation;
                         pickedItem = null;
-                        putItemBackText.GetComponent<TMP_Text>().enabled = false;
+                        DisableTexts();
                     }               
                 }
                 else
@@ -117,6 +112,7 @@ public class PlayerInteractionsController : MonoBehaviour
                     pickedItem.SetParent(playerHand);         // ALTERNATIVE: setParent(camera) to follow camera
                     pickedItem.position = playerHand.position;
                     pickedItem.rotation = Quaternion.Euler(playerHand.rotation.eulerAngles + new Vector3(0f, -15f, 90f));   // align to hand + offset so object is facing forward
+                    DisableTexts();
                 }
             }
         }

@@ -19,6 +19,18 @@ public class DoorInteractController : MonoBehaviour
     [SerializeField]
     public float maxInteractDistance = 5.0f;
 
+    [SerializeField]
+    private AudioSource _doorOpenSound = null;
+    private float _doorOpenSoundDelay = 0.0f;
+    [SerializeField]
+    private AudioSource _doorCloseSound = null;
+    [SerializeField]
+    private AudioSource _doorUnlockedSound = null;
+    [SerializeField]
+    private AudioSource _doorLockedSound = null;
+    [SerializeField]
+    private AudioSource _doorOpenWithCreakSound = null;
+
 
     private void Start()
     {
@@ -48,13 +60,22 @@ public class DoorInteractController : MonoBehaviour
     {
         _usedKeys.Clear();
         _isOpen = false;
-        StartCoroutine(RotateDoor(90));
+        StartCoroutine(RotateDoor(90, 1.0f));
+        _doorCloseSound.Play();
     }
 
     void OpenDoor()
     {
         _isOpen = true;
-        StartCoroutine(RotateDoor(0));
+        StartCoroutine(RotateDoor(0, 1.0f));
+        _doorOpenSound.Play();
+    }
+
+    void OpenDoorWithCreak()
+    {
+        _isOpen = true;
+        StartCoroutine(RotateDoor(0, 4.5f));
+        _doorOpenWithCreakSound.Play();
     }
 
     void TryOpenDoor()
@@ -71,7 +92,11 @@ public class DoorInteractController : MonoBehaviour
             if (_usedKeys.Count < 3)
             {
                 Debug.Log("Used key " + keyNumber);
-                _usedKeys.Add(keyNumber);
+
+                if (_usedKeys.Count < 2) // play key unlocking sound only for the first 2 keys
+                    _doorUnlockedSound.Play();
+
+                _usedKeys.Add(keyNumber);             
             }
             if (_usedKeys.Count == 3)
             {
@@ -81,22 +106,24 @@ public class DoorInteractController : MonoBehaviour
                     {
                         _usedKeys.Clear();
                         Debug.Log("Wrong key numbers or order!");
+                        _doorLockedSound.Play();
                         return;
                     }
-                }
-                Debug.Log("Door is now unlocked!");                            
+                }                                                    
                 _isLocked = false;
+                OpenDoorWithCreak();
             }
 
         }
+        else
+            _doorLockedSound.Play();
 
     }
 
-    IEnumerator RotateDoor(float targetAngle)
+    IEnumerator RotateDoor(float targetAngle, float rotationDuration)
     {
         float currentAngle = transform.eulerAngles.y;
-        float elapsedRotationTime = 0f;
-        float rotationDuration = 1f;
+        float elapsedRotationTime = 0f;       
         _isAnimating = true;
 
         while (elapsedRotationTime < rotationDuration)

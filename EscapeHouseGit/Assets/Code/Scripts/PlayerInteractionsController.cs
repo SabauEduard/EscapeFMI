@@ -7,9 +7,13 @@ public class PlayerInteractionsController : MonoBehaviour
 {
     public Transform playerHead;
     public Transform playerHand;
-    public TextMeshProUGUI pickUpText;
 
-    [SerializeField] private float itemPickupDistance = 5f;
+    public TextMeshProUGUI pickUpText;
+    public TextMeshProUGUI interactText;
+    public TextMeshProUGUI putItemBackText;
+
+    [SerializeField]
+    private float itemPickupDistance = 5f;
 
     private Transform pickedItem = null;
     private Vector3 initialPosition;     // initial position of held item
@@ -17,6 +21,13 @@ public class PlayerInteractionsController : MonoBehaviour
     private Transform initialParent = null;          // initial parent of held item
 
     private Transform targetedItem = null;
+
+    private void DisableTexts()
+    {
+        pickUpText.GetComponent<TMP_Text>().enabled = false;
+        interactText.GetComponent<TMP_Text>().enabled = false;
+        putItemBackText.GetComponent<TMP_Text>().enabled = false;
+    }
 
     void Update()
     {
@@ -27,21 +38,37 @@ public class PlayerInteractionsController : MonoBehaviour
         {
             if(targetedItem != null && targetedItem != hit.transform && targetedItem.GetComponent<Outline>() != null)   // exit hovering previous interactable object
                 targetedItem.GetComponent<Outline>().enabled = false;
-            targetedItem = hit.transform;
+            targetedItem = hit.transform;      
 
-            
-
-            if (hit.transform.GetComponent<Outline>() != null && pickedItem == null)    // if not holding item, highlight interactable object
+            if (hit.transform.GetComponent<Outline>() != null) // if interactable object has outline script
             {
-                pickUpText.GetComponent<TMP_Text>().enabled = true;
+                if (hit.collider.gameObject.GetComponent<PickableObjectTag>() != null)
+                {
+                    if (pickedItem == null)
+                        pickUpText.GetComponent<TMP_Text>().enabled = true;
+                }                   
+                else // text for any other interactable
+                    interactText.GetComponent<TMP_Text>().enabled = true;
+
                 hit.transform.GetComponent<Outline>().enabled = true;
             }
+            else
+            {
+                if (hit.collider.gameObject.GetComponent<KeyHangerTag>() != null)
+                {
+                    // if interactable object is the key hanger and item in hand
+                    if (pickedItem != null)
+                        putItemBackText.GetComponent<TMP_Text>().enabled = true;
+                }
+                else // text for any other interactable
+                    interactText.GetComponent<TMP_Text>().enabled = true;
+            }
                 
+
         }
         else if (targetedItem != null)  
         {
-            pickUpText.GetComponent<TMP_Text>().enabled = false;
-            
+            DisableTexts();         
             if (targetedItem.GetComponent<Outline>() != null)
                 targetedItem.GetComponent<Outline>().enabled = false;
         }
@@ -61,6 +88,7 @@ public class PlayerInteractionsController : MonoBehaviour
                         pickedItem.position = initialPosition;
                         pickedItem.rotation = initialRotation;
                         pickedItem = null;
+                        DisableTexts();
                     }               
                 }
                 else
@@ -84,6 +112,7 @@ public class PlayerInteractionsController : MonoBehaviour
                     pickedItem.SetParent(playerHand);         // ALTERNATIVE: setParent(camera) to follow camera
                     pickedItem.position = playerHand.position;
                     pickedItem.rotation = Quaternion.Euler(playerHand.rotation.eulerAngles + new Vector3(0f, -15f, 90f));   // align to hand + offset so object is facing forward
+                    DisableTexts();
                 }
             }
         }

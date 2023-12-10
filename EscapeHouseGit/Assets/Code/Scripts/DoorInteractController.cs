@@ -7,12 +7,29 @@ using UnityEngine;
 
 public class DoorInteractController : MonoBehaviour
 {
-    public bool isOpen = false;
-    public bool isLocked = true;
+    private bool _isAnimating = false;
+    private bool _isOpen = false;
+    private bool _isLocked = true;
+
     private List<int> _usedKeys = new List<int>();
-    private List<int> _correctKeys = new List<int> {2, 5, 6};
-    public float maxInteractDistance = 5.0f;
+    private readonly List<int> _correctKeys = new List<int> {2, 5, 6};
+
     private PlayerInteractionsController _player = null;
+
+    [SerializeField]
+    public float maxInteractDistance = 5.0f;
+
+    [SerializeField]
+    private AudioSource _doorOpenSound = null;
+    private float _doorOpenSoundDelay = 0.0f;
+    [SerializeField]
+    private AudioSource _doorCloseSound = null;
+    [SerializeField]
+    private AudioSource _doorUnlockedSound = null;
+    [SerializeField]
+    private AudioSource _doorLockedSound = null;
+    [SerializeField]
+    private AudioSource _doorOpenWithCreakSound = null;
 
 
     private void Start()
@@ -25,15 +42,13 @@ public class DoorInteractController : MonoBehaviour
         RaycastHit hit;
         bool cast = Physics.Raycast(_player.playerHead.position, _player.playerHead.forward, out hit, maxInteractDistance);
 
-        if (Input.GetKeyDown(KeyCode.F) && cast && hit.collider.gameObject.GetComponent<DoorTag>())
+        if (Input.GetKeyDown(KeyCode.F) && cast && hit.collider.gameObject.GetComponent<DoorTag>() && !_isAnimating)
         {
-            if (isOpen)
-            {
+            if (_isOpen)
                 CloseDoor();
-            }
             else
             {
-                if (isLocked)
+                if (_isLocked)
                     TryOpenDoor();
                 else
                     OpenDoor();
@@ -44,14 +59,23 @@ public class DoorInteractController : MonoBehaviour
     void CloseDoor()
     {
         _usedKeys.Clear();
-        isOpen = false;
-        StartCoroutine(RotateDoor(0));
+        _isOpen = false;
+        StartCoroutine(RotateDoor(90, 1.0f));
+        _doorCloseSound.Play();
     }
 
     void OpenDoor()
     {
-        isOpen = true;
-        StartCoroutine(RotateDoor(90));
+        _isOpen = true;
+        StartCoroutine(RotateDoor(0, 1.0f));
+        _doorOpenSound.Play();
+    }
+
+    void OpenDoorWithCreak()
+    {
+        _isOpen = true;
+        StartCoroutine(RotateDoor(0, 4.5f));
+        _doorOpenWithCreakSound.Play();
     }
 
     void TryOpenDoor()
@@ -68,7 +92,11 @@ public class DoorInteractController : MonoBehaviour
             if (_usedKeys.Count < 3)
             {
                 Debug.Log("Used key " + keyNumber);
-                _usedKeys.Add(keyNumber);
+
+                if (_usedKeys.Count < 2) // play key unlocking sound only for the first 2 keys
+                    _doorUnlockedSound.Play();
+
+                _usedKeys.Add(keyNumber);             
             }
             if (_usedKeys.Count == 3)
             {
@@ -78,22 +106,25 @@ public class DoorInteractController : MonoBehaviour
                     {
                         _usedKeys.Clear();
                         Debug.Log("Wrong key numbers or order!");
+                        _doorLockedSound.Play();
                         return;
                     }
-                }
-                Debug.Log("Door is now unlocked!");                            
-                isLocked = false;
+                }                                                    
+                _isLocked = false;
+                OpenDoorWithCreak();
             }
 
         }
+        else
+            _doorLockedSound.Play();
 
     }
 
-    IEnumerator RotateDoor(float targetAngle)
+    IEnumerator RotateDoor(float targetAngle, float rotationDuration)
     {
         float currentAngle = transform.eulerAngles.y;
-        float elapsedRotationTime = 0f;
-        float rotationDuration = 1f;
+        float elapsedRotationTime = 0f;       
+        _isAnimating = true;
 
         while (elapsedRotationTime < rotationDuration)
         {
@@ -105,5 +136,6 @@ public class DoorInteractController : MonoBehaviour
         }
 
         transform.eulerAngles = new Vector3(0, targetAngle, 0);
+        _isAnimating = false;
     }
 }

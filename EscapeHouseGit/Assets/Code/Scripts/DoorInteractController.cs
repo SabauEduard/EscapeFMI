@@ -21,7 +21,6 @@ public class DoorInteractController : MonoBehaviour
 
     [SerializeField]
     private AudioSource _doorOpenSound = null;
-    private float _doorOpenSoundDelay = 0.0f;
     [SerializeField]
     private AudioSource _doorCloseSound = null;
     [SerializeField]

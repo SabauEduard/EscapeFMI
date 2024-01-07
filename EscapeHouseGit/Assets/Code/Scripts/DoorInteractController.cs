@@ -9,9 +9,9 @@ public class DoorInteractController : MonoBehaviour
 {
     private bool _isAnimating = false;
     private bool _isOpen = false;
-    private bool _isLocked = true;
+    public bool _isLocked = true;
 
-    private List<int> _usedKeys = new List<int>();
+    public List<int> _usedKeys = new List<int>();
     private readonly List<int> _correctKeys = new List<int> {2, 5, 6};
 
     private PlayerInteractionsController _player = null;

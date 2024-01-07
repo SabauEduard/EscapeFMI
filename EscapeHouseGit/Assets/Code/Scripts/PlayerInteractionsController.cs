@@ -124,7 +124,8 @@ public class PlayerInteractionsController : MonoBehaviour
             return -1;
 
         GameObject obj = pickedItem.gameObject;
-        if(!obj.GetComponent<KeyTag>())
+        Debug.Log(!obj.GetComponent<KeyTag>());
+        if (!obj.GetComponent<KeyTag>())
             return -1;
         
         string objectName = obj.name;

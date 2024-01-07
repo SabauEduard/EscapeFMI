@@ -79,7 +79,6 @@ public class DoorInteractController : MonoBehaviour
 
     void TryOpenDoor()
     {
-        
         if (_player != null && _player.GetHeldKeyNumber() != -1)
         {
             int keyNumber = _player.GetHeldKeyNumber();

@@ -21,7 +21,6 @@ public class DoorInteractController : MonoBehaviour
 
     [SerializeField]
     private AudioSource _doorOpenSound = null;
-    private float _doorOpenSoundDelay = 0.0f;
     [SerializeField]
     private AudioSource _doorCloseSound = null;
     [SerializeField]
@@ -80,7 +79,6 @@ public class DoorInteractController : MonoBehaviour
 
     void TryOpenDoor()
     {
-        
         if (_player != null && _player.GetHeldKeyNumber() != -1)
         {
             int keyNumber = _player.GetHeldKeyNumber();

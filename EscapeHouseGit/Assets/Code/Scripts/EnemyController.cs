@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.SceneManagement;
 
 public class EnemyController : MonoBehaviour
 {
@@ -42,13 +43,12 @@ public class EnemyController : MonoBehaviour
         {
             agent.destination = player.position;
             agent.speed = chaseSpeed;
-            //animator.ResetTrigger("walk");
-            //animator.ResetTrigger("idle");
-            //animator.SetTrigger("chase");
+            animator.ResetTrigger("walk");
+            animator.ResetTrigger("idle");
+            animator.SetTrigger("chase");
             if (_distanceToPlayer <= catchDistance)
             {
-                // animator.ResetTrigger("chase");
-                //animator.SetTrigger("caught");
+                animator.ResetTrigger("chase");
                 death();
             }
         }
@@ -56,14 +56,14 @@ public class EnemyController : MonoBehaviour
         {
             agent.destination = _currentDest.position;
             agent.speed = walkSpeed;
-            //animator.ResetTrigger("idle");
-            //animator.ResetTrigger("chase");
-            //animator.SetTrigger("walk");
+            animator.ResetTrigger("idle");
+            animator.ResetTrigger("chase");
+            animator.SetTrigger("walk");
             if (agent.remainingDistance <= agent.stoppingDistance)
             {
-                //animator.ResetTrigger("walk");
-                //animator.ResetTrigger("chase");
-                //animator.SetTrigger("idle");
+                animator.ResetTrigger("walk");
+                animator.ResetTrigger("chase");
+                animator.SetTrigger("idle");
                 StopCoroutine("Idle");
                 StartCoroutine("Idle");
                 walking = false;
@@ -94,10 +94,9 @@ public class EnemyController : MonoBehaviour
 
     void death()
     {
-        player.position = new Vector3(0, 0, 0);
-        player.rotation = Quaternion.identity;
-        chasing = false;
-        walking = true;
-        _currentDest = destinations[Random.Range(0, destinations.Count)];
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        //chasing = false;
+        //walking = true;
+        //_currentDest = destinations[Random.Range(0, destinations.Count)];
     }
 }

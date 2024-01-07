@@ -29,7 +29,7 @@ public class HidingPlaceController : MonoBehaviour
             hidingPlayer.SetActive(true);
             float distance = Vector3.Distance(enemyTransform.position, player.transform.position);
             if (distance > loseDistance && _enemyController.chasing)
-            {
+            {               
                 _enemyController.stopChase();
             }
             _isHiding = true;

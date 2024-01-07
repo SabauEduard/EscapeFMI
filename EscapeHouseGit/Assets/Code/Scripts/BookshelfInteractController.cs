@@ -27,9 +27,6 @@ public class BookshelfInteractController : MonoBehaviour
             bool cast = Physics.Raycast(_player.playerHead.position, _player.playerHead.forward, out hit, maxInteractDistance);
 
             if (cast && hit.collider.gameObject.GetComponent<SecretBookTag>())
-            {
-                
-            }
                 if (!_alreadyMoved)
                 {
                     Debug.Log("Bookshelf moved");

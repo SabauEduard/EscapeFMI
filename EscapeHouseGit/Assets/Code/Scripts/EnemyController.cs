@@ -30,7 +30,10 @@ public class EnemyController : MonoBehaviour
         _distanceToPlayer = Vector3.Distance(transform.position, player.position);
         RaycastHit hit;
         bool cast = Physics.Raycast(transform.position + _rayCastOffset, direction, out hit, sightDistance);
-        
+        Debug.DrawRay(transform.position + _rayCastOffset, direction * sightDistance, Color.red);
+        if (hit.transform != null)
+            Debug.Log(hit.transform.name);
+
         if (cast && hit.transform.GetComponent<PlayerTag>())
         {
             walking = false;

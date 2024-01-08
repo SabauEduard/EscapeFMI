@@ -8,6 +8,8 @@ public class BookshelfInteractController : MonoBehaviour
 
     [SerializeField]
     public float maxInteractDistance = 5.0f;
+    [SerializeField]
+    public Transform secondPuzzleDoor;
     private bool _alreadyMoved = false;
     private AudioSource audioSource;
 
@@ -32,6 +34,7 @@ public class BookshelfInteractController : MonoBehaviour
                     Debug.Log("Bookshelf moved");
                     _alreadyMoved = true;
                     MoveBookshelfSmoothly();
+                    secondPuzzleDoor.GetComponent<DoorInteractController>()._isLocked = false;
                 }
         }
     }

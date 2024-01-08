@@ -40,7 +40,7 @@ public class HidingPlaceController : MonoBehaviour
             _isHiding = true;
             player.SetActive(false);
         }
-        if(_isHiding == true && (Input.GetKeyDown(KeyCode.Q) || Input.GetKeyDown(KeyCode.Space)))
+        if(_isHiding == true && Input.GetKeyDown(KeyCode.F))
         {
             player.SetActive(true);
             hidingPlayer.GetComponentInChildren<Camera>().enabled = false;

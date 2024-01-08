@@ -12,11 +12,15 @@ public class EnemyController : MonoBehaviour
     public float walkSpeed, chaseSpeed, minIdleTime, maxIdleTime, sightDistance, catchDistance, minChaseTime, maxChaseTime;
     public bool walking, chasing;
     public Transform player;
+    public AudioClip woodWalk, grassWalk, concreteWalk, woodRun, grassRun, concreteRun;
 
     private Transform _currentDest;
     private Transform _oldDest;
     private Vector3 _rayCastOffset;
     private float _distanceToPlayer;
+    private Coroutine footstepCoroutine;
+    [SerializeField]
+    private AudioSource footstepAudioSource;
 
     private void Start()
     {
@@ -42,11 +46,15 @@ public class EnemyController : MonoBehaviour
         }     
         if (chasing)
         {
+            if (agent.velocity.magnitude > 0.1f)
+                FootstepSoundCoroutine();
+
             agent.destination = player.position;
             agent.speed = chaseSpeed;
             animator.ResetTrigger("walk");
             animator.ResetTrigger("idle");
             animator.SetTrigger("chase");
+
             if (_distanceToPlayer <= catchDistance)
             {
                 animator.ResetTrigger("chase");
@@ -55,6 +63,9 @@ public class EnemyController : MonoBehaviour
         }
         if (walking)
         {
+            if (agent.velocity.magnitude > 0.1f)
+                FootstepSoundCoroutine();
+
             agent.destination = _currentDest.position;
             agent.speed = walkSpeed;
             animator.ResetTrigger("idle");
@@ -102,7 +113,7 @@ public class EnemyController : MonoBehaviour
         updateDest();
     }
 
-    public void updateDest()
+    void updateDest()
     {
         _currentDest = destinations[Random.Range(0, destinations.Count)];
         while (_currentDest == _oldDest)
@@ -110,6 +121,68 @@ public class EnemyController : MonoBehaviour
             _currentDest = destinations[Random.Range(0, destinations.Count)];
         }
         _oldDest = _currentDest;
+    }
+
+    void FootstepSoundCoroutine()
+    {
+        if (footstepCoroutine == null)
+        {
+            footstepCoroutine = StartCoroutine(PlayFootstepsWithDelay());
+        }
+    }
+
+    IEnumerator PlayFootstepsWithDelay()
+    {
+        RaycastHit hit;
+
+        if (Physics.Raycast(transform.position + _rayCastOffset, Vector3.down, out hit, 4.0f))
+        {
+            Debug.Log(hit.transform.name);
+
+            AudioClip footstepClip = null;
+
+            if (chasing)
+            {
+                if (hit.transform.GetComponent<WoodTag>())
+                {
+                    footstepClip = woodRun;
+                }
+                else if (hit.transform.GetComponent<GrassTag>())
+                {
+                    footstepClip = grassRun;
+                }
+                else if (hit.transform.GetComponent<ConcreteTag>())
+                {
+                    footstepClip = concreteRun;
+                }
+            }
+            else
+            {
+                if (hit.transform.GetComponent<WoodTag>())
+                {
+                    footstepClip = woodWalk;
+                }
+                else if (hit.transform.GetComponent<GrassTag>())
+                {
+                    footstepClip = grassWalk;
+                }
+                else if (hit.transform.GetComponent<ConcreteTag>())
+                {
+                    footstepClip = concreteWalk;
+                }
+            }
+
+            if (footstepClip != null && footstepAudioSource != null)
+            {
+                footstepAudioSource.clip = footstepClip;        
+                footstepAudioSource.Play();
+
+                yield return new WaitForSeconds(footstepAudioSource.clip.length + Random.Range(0, 0.3f));
+            }
+        }
+
+
+        footstepCoroutine = null;
     }
 
     void death()

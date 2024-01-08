@@ -14,13 +14,14 @@ public class EnemyController : MonoBehaviour
     public Transform player;
 
     private Transform _currentDest;
+    private Transform _oldDest;
     private Vector3 _rayCastOffset;
     private float _distanceToPlayer;
 
     private void Start()
     {
         walking = true;
-        _currentDest = destinations[Random.Range(0, destinations.Count)];
+        updateDest();
         _rayCastOffset = new Vector3(0, 1, 0);
     }
 
@@ -30,17 +31,14 @@ public class EnemyController : MonoBehaviour
         _distanceToPlayer = Vector3.Distance(transform.position, player.position);
         RaycastHit hit;
         bool cast = Physics.Raycast(transform.position + _rayCastOffset, direction, out hit, sightDistance);
-        Debug.DrawRay(transform.position + _rayCastOffset, direction * sightDistance, Color.red);
-        if (hit.transform != null)
-            Debug.Log(hit.transform.name);
 
         if (cast && hit.transform.GetComponent<PlayerTag>())
         {
             walking = false;
+            chasing = true;
             StopCoroutine("Idle");
             StopCoroutine("Chase");
             StartCoroutine("Chase");
-            chasing = true;
         }     
         if (chasing)
         {
@@ -62,24 +60,33 @@ public class EnemyController : MonoBehaviour
             animator.ResetTrigger("idle");
             animator.ResetTrigger("chase");
             animator.SetTrigger("walk");
-            if (agent.remainingDistance <= agent.stoppingDistance)
+
+            if (agent.remainingDistance <= agent.stoppingDistance && !agent.pathPending)
             {
-                animator.ResetTrigger("walk");
-                animator.ResetTrigger("chase");
-                animator.SetTrigger("idle");
-                StopCoroutine("Idle");
-                StartCoroutine("Idle");
-                walking = false;
+                if (!IsInvoking("StartIdle"))
+                {
+                    Invoke("StartIdle", 0.1f);
+                }
             }
-           
         }
+    }
+
+    void StartIdle()
+    {
+        StartCoroutine("Idle");
     }
 
     IEnumerator Idle()
     {
+        walking = false;
+        animator.ResetTrigger("walk");
+        animator.ResetTrigger("chase");
+        animator.SetTrigger("idle");
+
         yield return new WaitForSeconds(Random.Range(minIdleTime, maxIdleTime));
+
         walking = true;
-        _currentDest = destinations[Random.Range(0, destinations.Count)];
+        updateDest();
     }
 
     IEnumerator Chase()
@@ -92,7 +99,17 @@ public class EnemyController : MonoBehaviour
     {
         walking = true;
         chasing = false;
+        updateDest();
+    }
+
+    public void updateDest()
+    {
         _currentDest = destinations[Random.Range(0, destinations.Count)];
+        while (_currentDest == _oldDest)
+        {
+            _currentDest = destinations[Random.Range(0, destinations.Count)];
+        }
+        _oldDest = _currentDest;
     }
 
     void death()

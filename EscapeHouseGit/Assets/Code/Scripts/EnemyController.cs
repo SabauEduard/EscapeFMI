@@ -12,15 +12,17 @@ public class EnemyController : MonoBehaviour
     public float walkSpeed, chaseSpeed, minIdleTime, maxIdleTime, sightDistance, catchDistance, minChaseTime, maxChaseTime;
     public bool walking, chasing;
     public Transform player;
-    public AudioClip woodWalk, grassWalk, concreteWalk, woodRun, grassRun, concreteRun;
-
+    public AudioClip woodWalk, grassWalk, concreteWalk;
     private Transform _currentDest;
     private Transform _oldDest;
     private Vector3 _rayCastOffset;
     private float _distanceToPlayer;
     private Coroutine footstepCoroutine;
+    private Coroutine chaseMusicCoroutine;
     [SerializeField]
     private AudioSource footstepAudioSource;
+    [SerializeField]
+    private AudioSource chaseMusicAudioSource;
 
     private void Start()
     {
@@ -47,7 +49,10 @@ public class EnemyController : MonoBehaviour
         if (chasing)
         {
             if (agent.velocity.magnitude > 0.1f)
+            {
                 FootstepSoundCoroutine();
+                ChaseMusicCoroutine();
+            }
 
             agent.destination = player.position;
             agent.speed = chaseSpeed;
@@ -131,46 +136,35 @@ public class EnemyController : MonoBehaviour
         }
     }
 
+    void ChaseMusicCoroutine()
+    {
+        if (chaseMusicCoroutine == null)
+        {
+            chaseMusicCoroutine = StartCoroutine(PlayChaseMusic());
+        }
+    }
+
     IEnumerator PlayFootstepsWithDelay()
     {
         RaycastHit hit;
 
         if (Physics.Raycast(transform.position + _rayCastOffset, Vector3.down, out hit, 4.0f))
         {
-            Debug.Log(hit.transform.name);
-
             AudioClip footstepClip = null;
-
-            if (chasing)
+            
+            if (hit.transform.GetComponent<WoodTag>())
             {
-                if (hit.transform.GetComponent<WoodTag>())
-                {
-                    footstepClip = woodRun;
-                }
-                else if (hit.transform.GetComponent<GrassTag>())
-                {
-                    footstepClip = grassRun;
-                }
-                else if (hit.transform.GetComponent<ConcreteTag>())
-                {
-                    footstepClip = concreteRun;
-                }
+                footstepClip = woodWalk;
             }
-            else
+            else if (hit.transform.GetComponent<GrassTag>())
             {
-                if (hit.transform.GetComponent<WoodTag>())
-                {
-                    footstepClip = woodWalk;
-                }
-                else if (hit.transform.GetComponent<GrassTag>())
-                {
-                    footstepClip = grassWalk;
-                }
-                else if (hit.transform.GetComponent<ConcreteTag>())
-                {
-                    footstepClip = concreteWalk;
-                }
+                footstepClip = grassWalk;
             }
+            else if (hit.transform.GetComponent<ConcreteTag>())
+            {
+                footstepClip = concreteWalk;
+            }
+            
 
             if (footstepClip != null && footstepAudioSource != null)
             {
@@ -184,6 +178,20 @@ public class EnemyController : MonoBehaviour
 
         footstepCoroutine = null;
     }
+
+    IEnumerator PlayChaseMusic()
+    {
+        chaseMusicAudioSource.Play();
+
+        while (chaseMusicAudioSource.isPlaying && chasing)
+        {
+            yield return null;
+        }
+
+        chaseMusicAudioSource.Stop();
+        chaseMusicCoroutine = null;
+    }
+
 
     void death()
     {

@@ -11,6 +11,7 @@ public class PlayerInteractionsController : MonoBehaviour
     public TextMeshProUGUI pickUpText;
     public TextMeshProUGUI interactText;
     public TextMeshProUGUI putItemBackText;
+    public TextMeshProUGUI exitHidingSpotText;
 
     [SerializeField]
     private float itemPickupDistance = 5f;
@@ -22,11 +23,12 @@ public class PlayerInteractionsController : MonoBehaviour
 
     private Transform targetedItem = null;
 
-    private void DisableTexts()
+    public void DisableTexts()
     {
         pickUpText.GetComponent<TMP_Text>().enabled = false;
         interactText.GetComponent<TMP_Text>().enabled = false;
         putItemBackText.GetComponent<TMP_Text>().enabled = false;
+        exitHidingSpotText.GetComponent<TMP_Text>().enabled = false;
     }
 
     void Update()

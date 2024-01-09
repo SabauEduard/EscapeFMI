@@ -8,20 +8,22 @@ using UnityEngine;
 public class DoorInteractController : MonoBehaviour
 {
     private bool _isAnimating = false;
-    private bool _isOpen = false;
+    public bool _isOpen = false;
     public bool _isLocked = true;
 
     public List<int> _usedKeys = new List<int>();
     private readonly List<int> _correctKeys = new List<int> {2, 5, 6};
 
     private PlayerInteractionsController _player = null;
+    private string _doorTagComponent;
 
     [SerializeField]
     public float maxInteractDistance = 5.0f;
+    [SerializeField]
+    public int doorTagNumber;
 
     [SerializeField]
     private AudioSource _doorOpenSound = null;
-    private float _doorOpenSoundDelay = 0.0f;
     [SerializeField]
     private AudioSource _doorCloseSound = null;
     [SerializeField]
@@ -35,6 +37,7 @@ public class DoorInteractController : MonoBehaviour
     private void Start()
     {
         _player = FindObjectOfType<PlayerInteractionsController>();
+        _doorTagComponent = "DoorTag" + doorTagNumber;
     }
 
     void Update()
@@ -42,14 +45,19 @@ public class DoorInteractController : MonoBehaviour
         RaycastHit hit;
         bool cast = Physics.Raycast(_player.playerHead.position, _player.playerHead.forward, out hit, maxInteractDistance);
 
-        if (Input.GetKeyDown(KeyCode.F) && cast && hit.collider.gameObject.GetComponent<DoorTag>() && !_isAnimating)
+        if (Input.GetKeyDown(KeyCode.F) && cast && hit.collider.gameObject.GetComponent(_doorTagComponent) && !_isAnimating)
         {
             if (_isOpen)
                 CloseDoor();
             else
             {
                 if (_isLocked)
-                    TryOpenDoor();
+                {
+                    if (doorTagNumber == 5) // Second puzzle door that is unlocked when the bookshelf is moved, we don't want the player to be able to open it with keys
+                        _doorLockedSound.Play();
+                    else
+                        TryOpenDoor();
+                }
                 else
                     OpenDoor();
             }
@@ -60,14 +68,14 @@ public class DoorInteractController : MonoBehaviour
     {
         _usedKeys.Clear();
         _isOpen = false;
-        StartCoroutine(RotateDoor(90, 1.0f));
+        StartCoroutine(RotateDoor(transform.eulerAngles.y + 90, 1.0f));
         _doorCloseSound.Play();
     }
 
     void OpenDoor()
     {
         _isOpen = true;
-        StartCoroutine(RotateDoor(0, 1.0f));
+        StartCoroutine(RotateDoor(transform.eulerAngles.y - 90, 1.0f));
         _doorOpenSound.Play();
     }
 
@@ -80,7 +88,6 @@ public class DoorInteractController : MonoBehaviour
 
     void TryOpenDoor()
     {
-        
         if (_player != null && _player.GetHeldKeyNumber() != -1)
         {
             int keyNumber = _player.GetHeldKeyNumber();

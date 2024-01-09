@@ -35,11 +35,13 @@ public class HidingPlaceController : MonoBehaviour
             hidingPlayer.GetComponentInChildren<Camera>().GetComponent<AudioListener>().enabled = true; 
             _playerController.DisableTexts();
             _playerController.exitHidingSpotText.GetComponent<TMP_Text>().enabled = true;
+
             float distance = Vector3.Distance(enemyTransform.position, player.transform.position);
-            if (distance > loseDistance && _enemyController.chasing)
-            {               
-                _enemyController.stopChase();
+            if ((distance > loseDistance || _enemyController.shouldCatchIfGoingToHiding()) && _enemyController.chasing)
+            {
+                StartCoroutine(DelayedStopChase(distance));
             }
+
             _isHiding = true;
             player.SetActive(false);
         }
@@ -52,5 +54,12 @@ public class HidingPlaceController : MonoBehaviour
             _isHiding = false;
             _playerController.DisableTexts();
         }
+    }
+
+    IEnumerator DelayedStopChase(float distance)
+    {
+        float scaledDelay = Mathf.Clamp(distance * 0.1f, 0f, 8.0f);
+        yield return new WaitForSeconds(scaledDelay);
+        _enemyController.stopChase();
     }
 }

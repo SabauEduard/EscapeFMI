@@ -9,7 +9,7 @@ public class EnemyController : MonoBehaviour
     public NavMeshAgent agent;
     public List<Transform> destinations;
     public Animator animator;
-    public float walkSpeed, chaseSpeed, minIdleTime, maxIdleTime, sightDistance, catchDistance, minChaseTime, maxChaseTime;
+    public float walkSpeed, chaseSpeed, minIdleTime, maxIdleTime, sightDistance, catchDistance, minChaseTime, maxChaseTime, fovAngle, closeDistance, fovMultiplier;
     public bool walking, chasing;
     public Transform player;
     public AudioClip woodWalk, grassWalk, concreteWalk;
@@ -33,19 +33,7 @@ public class EnemyController : MonoBehaviour
 
     private void Update()
     {
-        Vector3 direction = (player.position - transform.position).normalized;
-        _distanceToPlayer = Vector3.Distance(transform.position, player.position);
-        RaycastHit hit;
-        bool cast = Physics.Raycast(transform.position + _rayCastOffset, direction, out hit, sightDistance);
-
-        if (cast && hit.transform.GetComponent<PlayerTag>())
-        {
-            walking = false;
-            chasing = true;
-            StopCoroutine("Idle");
-            StopCoroutine("Chase");
-            StartCoroutine("Chase");
-        }     
+        checkConditionsAndStartChase();
         if (chasing)
         {
             if (agent.velocity.magnitude > 0.1f)
@@ -85,6 +73,52 @@ public class EnemyController : MonoBehaviour
                 }
             }
         }
+    }
+
+    void checkConditionsAndStartChase()
+    {
+        Vector3 directionToPlayer = (player.position - transform.position).normalized;
+        float angleToPlayer = Vector3.Angle(transform.forward, directionToPlayer);
+        _distanceToPlayer = Vector3.Distance(transform.position, player.position);
+        // if player is close to the enemy but not in fov, the enemy will still see the player with a multiplier depedning if it's moving or not
+        float closeDistanceMultiplier = agent.velocity.magnitude > 0.1f ? 1f : 0.25f;
+        // distance is weighted by fov angle as in the middle of the fov angle the distance is more important than at the edges
+        float weightedDistance = _distanceToPlayer * Mathf.Lerp(1.0f, fovMultiplier, Mathf.InverseLerp(0.0f, fovAngle / 2.0f, angleToPlayer));
+        weightedDistance = Mathf.Clamp(weightedDistance, sightDistance / 2.0f, sightDistance);
+
+        if (angleToPlayer < fovAngle || weightedDistance < closeDistanceMultiplier * closeDistance)
+        {
+            RaycastHit hit;
+            bool cast = Physics.Raycast(transform.position + _rayCastOffset, directionToPlayer, out hit, sightDistance);
+
+            if (cast && hit.transform.GetComponent<PlayerTag>())
+            {
+                walking = false;
+                chasing = true;
+                StopCoroutine("Idle");
+                StopCoroutine("Chase");
+                StartCoroutine("Chase");
+            }
+        }
+    }
+
+    public bool shouldCatchIfGoingToHiding()
+    {
+        // function used by hiding place controller to check if the enemy should catch the player if he's going to a hiding place
+        // (if the player is in Fov I use sightDistance instead of loseDistance from hiding place))
+        Vector3 directionToPlayer = (player.position - transform.position).normalized;
+        float angleToPlayer = Vector3.Angle(transform.forward, directionToPlayer);
+        _distanceToPlayer = Vector3.Distance(transform.position, player.position);
+
+        if(angleToPlayer < fovAngle)
+        {
+            RaycastHit hit;
+            bool cast = Physics.Raycast(transform.position + _rayCastOffset, directionToPlayer, out hit, sightDistance);
+
+            if (cast && hit.transform.GetComponent<PlayerTag>())
+                return true;
+        }
+        return false;
     }
 
     void StartIdle()

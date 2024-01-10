@@ -83,13 +83,13 @@ public class EnemyController : MonoBehaviour
         // if player is close to the enemy but not in fov, the enemy will still see the player with a multiplier depedning if it's moving or not
         float closeDistanceMultiplier = agent.velocity.magnitude > 0.1f ? 1f : 0.25f;
         // distance is weighted by fov angle as in the middle of the fov angle the distance is more important than at the edges
-        float weightedDistance = _distanceToPlayer * Mathf.Lerp(1.0f, fovMultiplier, Mathf.InverseLerp(0.0f, fovAngle / 2.0f, angleToPlayer));
-        weightedDistance = Mathf.Clamp(weightedDistance, sightDistance / 2.0f, sightDistance);
+        float weightedSightDistance = sightDistance * Mathf.Lerp(1.0f, fovMultiplier, Mathf.InverseLerp(0.0f, fovAngle / 2.0f, angleToPlayer));
+        weightedSightDistance = Mathf.Clamp(weightedSightDistance, sightDistance / 2.0f, sightDistance);
 
-        if (angleToPlayer < fovAngle || weightedDistance < closeDistanceMultiplier * closeDistance)
+        if (angleToPlayer < fovAngle || _distanceToPlayer < closeDistanceMultiplier * closeDistance)
         {
             RaycastHit hit;
-            bool cast = Physics.Raycast(transform.position + _rayCastOffset, directionToPlayer, out hit, sightDistance);
+            bool cast = Physics.Raycast(transform.position + _rayCastOffset, directionToPlayer, out hit, weightedSightDistance);
 
             if (cast && hit.transform.GetComponent<PlayerTag>())
             {

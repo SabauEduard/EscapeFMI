@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class HidingPlaceController : MonoBehaviour
 {
-    public float loseDistance, maxInteractDistance;
+    public float maxInteractDistance;
     public GameObject player, hidingPlayer;
     public Transform enemyTransform;
     public int hidingPlaceTagNumber;
@@ -37,7 +37,7 @@ public class HidingPlaceController : MonoBehaviour
             _playerController.exitHidingSpotText.GetComponent<TMP_Text>().enabled = true;
 
             float distance = Vector3.Distance(enemyTransform.position, player.transform.position);
-            if ((distance > loseDistance || _enemyController.shouldCatchIfGoingToHiding()) && _enemyController.chasing)
+            if (!_enemyController.shouldCatchIfGoingToHiding() && _enemyController.chasing)
             {
                 StartCoroutine(DelayedStopChase(distance));
             }

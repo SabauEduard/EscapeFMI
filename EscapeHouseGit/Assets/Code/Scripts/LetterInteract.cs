@@ -34,7 +34,7 @@ public class LetterInteract : MonoBehaviour
         IEnumerator PlaySubtitle()
         {
             textbox.SetActive(true);
-            yield return new WaitForSeconds(40);
+            yield return new WaitForSeconds(30);
             textbox.SetActive(false);
         }
     }

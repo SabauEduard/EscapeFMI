@@ -10,17 +10,15 @@ public class PauseMenu : MonoBehaviour
     public static bool paused = false;
     public GameObject PauseMenuCanvas;
     public GameObject player;
-    // Start is called before the first frame update
+    
     void Start()
     {
-        
         Time.timeScale = 1f;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
             if (paused)
             {
@@ -39,6 +37,7 @@ public class PauseMenu : MonoBehaviour
         Time.timeScale = 0f; // freeze time
         paused = true;
         player.GetComponent<FirstPersonController>().enabled = false;
+        player.GetComponent<StarterAssetsInputs>().jump = false;
     }
     public void Play()
     {
@@ -46,6 +45,7 @@ public class PauseMenu : MonoBehaviour
         Time.timeScale = 1f;
         paused = false;
         player.GetComponent<FirstPersonController>().enabled = true;
+        player.GetComponent<StarterAssetsInputs>().jump = false;
     }
 
     public void MainMenuButton()

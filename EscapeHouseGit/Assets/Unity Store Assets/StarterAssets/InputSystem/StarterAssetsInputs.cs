@@ -12,6 +12,7 @@ namespace StarterAssets
 		public Vector2 look;
 		public bool jump;
 		public bool sprint;
+		public AudioSource jumpAudio;
 
 		[Header("Movement Settings")]
 		public bool analogMovement;
@@ -37,6 +38,7 @@ namespace StarterAssets
 		public void OnJump(InputValue value)
 		{
 			JumpInput(value.isPressed);
+			jumpAudio.Play();
 		}
 
 		public void OnSprint(InputValue value)

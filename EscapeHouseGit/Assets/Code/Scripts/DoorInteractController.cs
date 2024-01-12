@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -127,7 +128,7 @@ public class DoorInteractController : MonoBehaviour
 
     }
 
-    IEnumerator RotateDoor(float targetAngle, float rotationDuration)
+    public IEnumerator RotateDoor(float targetAngle, float rotationDuration)
     {
         float currentAngle = transform.eulerAngles.y;
         float elapsedRotationTime = 0f;       
@@ -145,4 +146,5 @@ public class DoorInteractController : MonoBehaviour
         transform.eulerAngles = new Vector3(0, targetAngle, 0);
         _isAnimating = false;
     }
+
 }

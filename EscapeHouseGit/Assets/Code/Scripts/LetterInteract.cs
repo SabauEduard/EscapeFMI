@@ -22,13 +22,16 @@ public class LetterInteract : MonoBehaviour
 
     void Update()
     {
-        RaycastHit hit;
-        bool cast = Physics.Raycast(_player.playerHead.position, _player.playerHead.forward, out hit, maxInteractDistance);
-
-        if (Input.GetKeyDown(KeyCode.F) && cast && hit.collider.gameObject.GetComponent(_letterTagComponent))
+        if (!playSound.isPlaying)
         {
-            playSound.Play();
-            StartCoroutine(PlaySubtitle());
+            RaycastHit hit;
+            bool cast = Physics.Raycast(_player.playerHead.position, _player.playerHead.forward, out hit, maxInteractDistance);
+
+            if (Input.GetKeyDown(KeyCode.F) && cast && hit.collider.gameObject.GetComponent(_letterTagComponent))
+            {
+                playSound.Play();
+                StartCoroutine(PlaySubtitle());
+            }
         }
 
         IEnumerator PlaySubtitle()

@@ -23,6 +23,8 @@ public class PlayerInteractionsController : MonoBehaviour
 
     private Transform targetedItem = null;
 
+    public static int globalVariableForInteractionLetters = 0;
+
     public void DisableTexts()
     {
         pickUpText.GetComponent<TMP_Text>().enabled = false;

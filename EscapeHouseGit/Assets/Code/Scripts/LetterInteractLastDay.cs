@@ -45,9 +45,17 @@ public class LetterInteractLastDay : MonoBehaviour
                 if (PlayerInteractionsController.globalVariableForInteractionLetters == 1)
                 {
                     doorSound.Play();
-                    StartCoroutine(barnDoor.RotateDoor(transform.eulerAngles.y + 90, 1.0f));
-                    barnDoor._isLocked = true;
-                    barnDoor._isOpen = false;
+
+                    if (barnDoor._isOpen == false)
+                    {
+                        barnDoor._isLocked = true;
+                    }
+                    else
+                    {
+                        StartCoroutine(barnDoor.RotateDoor(transform.eulerAngles.y - 90, 1.0f));
+                        barnDoor._isOpen = false;
+                        barnDoor._isLocked = true;
+                    }
                 }
                 otherSound.Stop();
                 otherText.SetActive(false);

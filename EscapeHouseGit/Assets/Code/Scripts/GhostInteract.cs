@@ -14,11 +14,9 @@ public class GhostInteract : MonoBehaviour
     private string _letterTagComponent;
 
     public GameObject scriptGhostRay;
-  
-    public GameObject ghostStatue;
 
     [SerializeField]
-    public float maxInteractDistance = 5.0f;
+    public float maxInteractDistance = 10.0f;
     private void Start()
     {
         _player = FindObjectOfType<PlayerInteractionsController>();
@@ -41,7 +39,6 @@ public class GhostInteract : MonoBehaviour
             {
                 yield return new WaitForSeconds(1);
                 scriptGhostRay.SetActive(true);
-                ghostStatue.SetActive(true);
             }
         }
     }

@@ -35,7 +35,11 @@ public class ScriptGhostRay : MonoBehaviour
 
     public GameObject interactText;
 
+    public GameObject filterFlashback;
+
     public AudioSource ghostCry;
+
+    public GameObject ghostStatue;
 
     [SerializeField]
     public float maxInteractDistance = 5.0f;
@@ -51,6 +55,8 @@ public class ScriptGhostRay : MonoBehaviour
 
         soundLetter1.SetActive(false);
         soundLetter2.SetActive(false);
+
+        filterFlashback.SetActive(true);
 
         StartCoroutine(PlaySubtitle());
 
@@ -83,9 +89,14 @@ public class ScriptGhostRay : MonoBehaviour
             EitherYou.SetActive(false);
 
             CutSceneCamera.SetActive(false);
-            mainCamera.SetActive(true);
+
+            filterFlashback.SetActive(false);
+
             playerControl.SetActive(true);
             _player.enabled = true;
+            ghostStatue.SetActive(true);
+
+            mainCamera.SetActive(true);
 
             SeemsLikeSound.Play();
             SeemsLike.SetActive(true);

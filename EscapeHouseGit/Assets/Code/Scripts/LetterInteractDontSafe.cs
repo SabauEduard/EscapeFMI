@@ -46,10 +46,17 @@ public class LetterInteractDontSafe : MonoBehaviour
                 PlayerInteractionsController.globalVariableForInteractionLetters += 1;
                 if (PlayerInteractionsController.globalVariableForInteractionLetters == 1)
                 {
-                    barnDoor._isLocked = true;
-                    barnDoor._isOpen = false;
-                    StartCoroutine(barnDoor.RotateDoor(transform.eulerAngles.y + 90, 1.0f));
                     doorSound.Play();
+                    if (barnDoor._isOpen == false)
+                    {
+                        barnDoor._isLocked = true;
+                    }
+                    else
+                    {
+                        StartCoroutine(barnDoor.RotateDoor(transform.eulerAngles.y - 90, 1.0f));
+                        barnDoor._isOpen = false;
+                        barnDoor._isLocked = true;
+                    }
                 }
                 otherSound.Stop();
                 otherText.SetActive(false);

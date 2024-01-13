@@ -15,8 +15,6 @@ public class LeverInteract : MonoBehaviour
 
     public GameObject leverObject;
 
-    public float sliderLastX = -45.0f;
-
     [SerializeField]
     public float maxInteractDistance = 5.0f;
     private void Start()
@@ -32,10 +30,15 @@ public class LeverInteract : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.F) && cast && hit.collider.gameObject.GetComponent(_letterTagComponent))
         {
+            BoxCollider boxCollider = GetComponent<BoxCollider>();
+            boxCollider.enabled = false;
+
             Vector3 rotationToAdd = new Vector3(90, 90, 90);
-            transform.Rotate(rotationToAdd * Time.deltaTime);
+            transform.Rotate(rotationToAdd);
+
             barnDoor._isLocked = false;
             barnDoor._isOpen = true;
+
             doorSound.Play();
         }
     }

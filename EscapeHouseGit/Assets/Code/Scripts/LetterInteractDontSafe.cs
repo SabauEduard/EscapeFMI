@@ -14,6 +14,12 @@ public class LetterInteractDontSafe : MonoBehaviour
     public AudioSource otherSound;
     public GameObject textbox;
     public GameObject otherText;
+    public GameObject ghostInteract;
+
+    public AudioSource doorSound;
+
+    public GameObject DoorBarn;
+    DoorInteractController barnDoor;
 
 
     [SerializeField]
@@ -22,19 +28,45 @@ public class LetterInteractDontSafe : MonoBehaviour
     {
         _player = FindObjectOfType<PlayerInteractionsController>();
         _letterTagComponent = "LetterTagDontSafe";
+        barnDoor = DoorBarn.GetComponent<DoorInteractController>();
     }
 
     void Update()
     {
-        RaycastHit hit;
-        bool cast = Physics.Raycast(_player.playerHead.position, _player.playerHead.forward, out hit, maxInteractDistance);
 
-        if (Input.GetKeyDown(KeyCode.F) && cast && hit.collider.gameObject.GetComponent(_letterTagComponent))
+        if (!playSound.isPlaying)
         {
-            otherSound.Stop();
-            otherText.SetActive(false);
-            playSound.Play();
-            StartCoroutine(PlaySubtitle());
+            RaycastHit hit;
+            bool cast = Physics.Raycast(_player.playerHead.position, _player.playerHead.forward, out hit, maxInteractDistance);
+
+            if (Input.GetKeyDown(KeyCode.F) && cast && hit.collider.gameObject.GetComponent(_letterTagComponent))
+            {
+                BoxCollider boxCollider = GetComponent<BoxCollider>();
+                boxCollider.enabled = false;
+
+                PlayerInteractionsController.globalVariableForInteractionLetters += 1;
+                if (PlayerInteractionsController.globalVariableForInteractionLetters == 1)
+                {
+                    doorSound.Play();
+                    if (barnDoor._isOpen == false)
+                    {
+                        barnDoor._isLocked = true;
+                    }
+                    else
+                    {
+                        barnDoor.CloseDoor();
+                        barnDoor._isLocked = true;
+                    }
+                }
+                otherSound.Stop();
+                otherText.SetActive(false);
+                playSound.Play();
+                StartCoroutine(PlaySubtitle());
+                if (PlayerInteractionsController.globalVariableForInteractionLetters >= 2)
+                {
+                    ghostInteract.SetActive(true);
+                }
+            }
         }
 
         IEnumerator PlaySubtitle()

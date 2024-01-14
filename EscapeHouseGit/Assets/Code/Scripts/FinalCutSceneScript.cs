@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Experimental.AI;
+using UnityEngine.SceneManagement;
 using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class FinalCutSceneScript : MonoBehaviour
@@ -172,6 +173,8 @@ public class FinalCutSceneScript : MonoBehaviour
                 whisperSound.GetComponent<AudioSource>().spatialBlend = 0;
 
                 yield return new WaitForSeconds(10);
+
+                SceneManager.LoadScene("MainMenu");
             }
         }
     }

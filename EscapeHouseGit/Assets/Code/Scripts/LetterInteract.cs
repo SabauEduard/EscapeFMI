@@ -14,6 +14,8 @@ public class LetterInteract : MonoBehaviour
     public AudioSource playSound;
     public GameObject textbox;
 
+    private bool soundPlayed = false;
+
     public AudioSource otherSound;
     public GameObject otherText;
 
@@ -24,6 +26,9 @@ public class LetterInteract : MonoBehaviour
 
     [SerializeField]
     public float maxInteractDistance = 5.0f;
+
+    private int layerMask = ~(1 << 1);
+
     private void Start()
     {
         _player = FindObjectOfType<PlayerInteractionsController>();
@@ -36,25 +41,29 @@ public class LetterInteract : MonoBehaviour
         if (!playSound.isPlaying)
         {
             RaycastHit hit;
-            bool cast = Physics.Raycast(_player.playerHead.position, _player.playerHead.forward, out hit, maxInteractDistance);
+            bool cast = Physics.Raycast(_player.playerHead.position, _player.playerHead.forward, out hit, maxInteractDistance, layerMask);
 
             if (Input.GetKeyDown(KeyCode.F) && cast && hit.collider.gameObject.GetComponent(_letterTagComponent))
             {
-                PlayerInteractionsController.globalVariableForInteractionDesk += 1;
-                if (PlayerInteractionsController.globalVariableForInteractionDesk == 2)
+                if (!soundPlayed)
                 {
-                    universityDoor._isLocked = false;
-                    secondPuzzleDoor.GetComponent<DoorInteractController>()._isLocked = false;
+                    PlayerInteractionsController.globalVariableForInteractionDesk += 1;
+                    if (PlayerInteractionsController.globalVariableForInteractionDesk == 2)
+                    {
+                        universityDoor._isLocked = false;
+                        secondPuzzleDoor.GetComponent<DoorInteractController>()._isLocked = false;
+                    }
+                    if (otherSound.isPlaying)
+                    {
+                        otherSound.enabled = false;
+                        otherText.SetActive(false);
+                    }
+                    playSound.Play();
+                    StartCoroutine(PlaySubtitle());
+                    soundPlayed = true;
                 }
-                if (otherSound.isPlaying)
-                {
-                    otherSound.enabled = false;
-                    otherText.SetActive(false);
-                }
-                playSound.Play();
-                StartCoroutine(PlaySubtitle());
-                BoxCollider boxCollider = GetComponent<BoxCollider>();
-                boxCollider.enabled = false;
+                //BoxCollider boxCollider = GetComponent<BoxCollider>();
+                //boxCollider.enabled = false;
             }
         }
 

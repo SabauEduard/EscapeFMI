@@ -75,3 +75,6 @@ Thumbs.db.meta
 
 # VS Code
 *.vscode
+
+# Blender
+*.blend1

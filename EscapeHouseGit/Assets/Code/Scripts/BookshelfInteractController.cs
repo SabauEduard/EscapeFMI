@@ -11,6 +11,7 @@ public class BookshelfInteractController : MonoBehaviour
     private bool _alreadyMoved = false;
     private AudioSource audioSource;
 
+    private int layerMask = ~(1 << 1);
 
     void Start()
     {
@@ -24,7 +25,7 @@ public class BookshelfInteractController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.F))
         {
             RaycastHit hit;
-            bool cast = Physics.Raycast(_player.playerHead.position, _player.playerHead.forward, out hit, maxInteractDistance);
+            bool cast = Physics.Raycast(_player.playerHead.position, _player.playerHead.forward, out hit, maxInteractDistance, layerMask);
 
             if (cast && hit.collider.gameObject.GetComponent<SecretBookTag>())
                 if (!_alreadyMoved)

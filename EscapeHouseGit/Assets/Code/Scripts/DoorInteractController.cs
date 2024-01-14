@@ -34,6 +34,7 @@ public class DoorInteractController : MonoBehaviour
     [SerializeField]
     private AudioSource _doorOpenWithCreakSound = null;
 
+    private int layerMask = ~(1 << 1);
 
     private void Start()
     {
@@ -44,7 +45,7 @@ public class DoorInteractController : MonoBehaviour
     void Update()
     {
         RaycastHit hit;
-        bool cast = Physics.Raycast(_player.playerHead.position, _player.playerHead.forward, out hit, maxInteractDistance);
+        bool cast = Physics.Raycast(_player.playerHead.position, _player.playerHead.forward, out hit, maxInteractDistance, layerMask);
 
         if (Input.GetKeyDown(KeyCode.F) && cast && hit.collider.gameObject.GetComponent(_doorTagComponent) && !_isAnimating)
         {

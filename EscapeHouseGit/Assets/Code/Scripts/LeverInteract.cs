@@ -10,10 +10,17 @@ public class LeverInteract : MonoBehaviour
 
     public AudioSource doorSound;
 
+    public GameObject ghostStatue;
+    public GameObject fireObject;
+
+    public GameObject ghostCry;
+
+    public GameObject houseMap;
+
     public GameObject DoorBarn;
     DoorInteractController barnDoor;
 
-    public AudioSource whispersSound;
+    public GameObject whispersSound;
 
     [SerializeField]
     public Transform noahDoor;
@@ -45,11 +52,28 @@ public class LeverInteract : MonoBehaviour
             Vector3 rotationToAdd = new Vector3(90, 90, 90);
             transform.Rotate(rotationToAdd);
 
-            barnDoor._isLocked = false;
-            noahDoor.GetComponent<DoorInteractController>()._isLocked = false;
-            whispersSound.enabled = true;
+            StartCoroutine(PlaySubtitle());
 
-            doorSound.Play();
+            IEnumerator PlaySubtitle()
+            {
+                houseMap.SetActive(true);
+                yield return new WaitForSeconds(1);
+                fireObject.SetActive(true);
+                fireObject.GetComponent<ParticleSystem>().Play();
+                yield return new WaitForSeconds(4);
+                ghostStatue.GetComponent<Animator>().enabled = true;
+                yield return new WaitForSeconds(4);
+                fireObject.GetComponent<Animator>().enabled = true;
+                yield return new WaitForSeconds(5);
+                fireObject.SetActive(false);
+                ghostCry.SetActive(false);
+
+                barnDoor._isLocked = false;
+                doorSound.Play();
+            }
+
+            noahDoor.GetComponent<DoorInteractController>()._isLocked = false;
+            whispersSound.SetActive(true);
         }
     }
 

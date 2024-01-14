@@ -14,6 +14,8 @@ public class LetterInteract : MonoBehaviour
     public AudioSource playSound;
     public GameObject textbox;
 
+    private bool soundPlayed = false;
+
     public AudioSource otherSound;
     public GameObject otherText;
 
@@ -43,21 +45,25 @@ public class LetterInteract : MonoBehaviour
 
             if (Input.GetKeyDown(KeyCode.F) && cast && hit.collider.gameObject.GetComponent(_letterTagComponent))
             {
-                PlayerInteractionsController.globalVariableForInteractionDesk += 1;
-                if (PlayerInteractionsController.globalVariableForInteractionDesk == 2)
+                if (!soundPlayed)
                 {
-                    universityDoor._isLocked = false;
-                    secondPuzzleDoor.GetComponent<DoorInteractController>()._isLocked = false;
+                    PlayerInteractionsController.globalVariableForInteractionDesk += 1;
+                    if (PlayerInteractionsController.globalVariableForInteractionDesk == 2)
+                    {
+                        universityDoor._isLocked = false;
+                        secondPuzzleDoor.GetComponent<DoorInteractController>()._isLocked = false;
+                    }
+                    if (otherSound.isPlaying)
+                    {
+                        otherSound.enabled = false;
+                        otherText.SetActive(false);
+                    }
+                    playSound.Play();
+                    StartCoroutine(PlaySubtitle());
+                    soundPlayed = true;
                 }
-                if (otherSound.isPlaying)
-                {
-                    otherSound.enabled = false;
-                    otherText.SetActive(false);
-                }
-                playSound.Play();
-                StartCoroutine(PlaySubtitle());
-                BoxCollider boxCollider = GetComponent<BoxCollider>();
-                boxCollider.enabled = false;
+                //BoxCollider boxCollider = GetComponent<BoxCollider>();
+                //boxCollider.enabled = false;
             }
         }
 

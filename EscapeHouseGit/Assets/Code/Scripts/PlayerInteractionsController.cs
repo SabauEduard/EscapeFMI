@@ -130,7 +130,10 @@ public class PlayerInteractionsController : MonoBehaviour
                     pickedItem.rotation = Quaternion.Euler(playerHand.rotation.eulerAngles + new Vector3(0f, -15f, 90f));   // align to hand + offset so object is facing forward
                     DisableTexts();
                 }
-                else if (hit.collider.gameObject.GetComponent<HintTag>())
+                else if (hit.collider.gameObject.GetComponent<HintTag>() 
+                    || hit.collider.gameObject.GetComponent<LetterTag>()
+                    || hit.collider.gameObject.GetComponent<LetterTagDontSafe>()
+                    || hit.collider.gameObject.GetComponent<LetterTagLastDay>())
                 {
                     pickedItem = hit.transform;
                     initialPosition = pickedItem.position;      // save initial state
@@ -142,8 +145,19 @@ public class PlayerInteractionsController : MonoBehaviour
 
                     pickedItem.SetParent(playerInFront);
                     pickedItem.position = playerInFront.position + new Vector3(0f, 0f, 0f);
-                    pickedItem.rotation = Quaternion.Euler(playerInFront.rotation.eulerAngles + new Vector3(180f, 0f, 180f));   // align to camera + offset so object is facing camera
-                    // pickedItem.rotation = Quaternion.Euler(playerInFront.rotation.eulerAngles);
+                    
+                    if (hit.collider.gameObject.GetComponent<HintTag>())
+                        pickedItem.rotation = Quaternion.Euler(playerInFront.rotation.eulerAngles + new Vector3(180f, 0f, 180f));   // align to camera + offset so object is facing camera
+                    
+                    if (hit.collider.gameObject.GetComponent<LetterTag>())
+                        pickedItem.rotation = Quaternion.Euler(playerInFront.rotation.eulerAngles + new Vector3(180f, 0f, 0f));
+
+                    if (hit.collider.gameObject.GetComponent<LetterTagDontSafe>())
+                        pickedItem.rotation = Quaternion.Euler(playerInFront.rotation.eulerAngles + new Vector3(180f, 0f, -90f));
+
+                    if (hit.collider.gameObject.GetComponent<LetterTagLastDay>())
+                        pickedItem.rotation = Quaternion.Euler(playerInFront.rotation.eulerAngles + new Vector3(180f, 0f, -90f));
+
                     DisableTexts();
                 }
             }

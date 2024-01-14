@@ -16,6 +16,8 @@ public class LetterInteractLastDay : MonoBehaviour
     public GameObject otherText;
     public GameObject ghostInteract;
 
+    private bool soundPlayed = false;
+
     public AudioSource doorSound;
 
     public GameObject DoorBarn;
@@ -42,31 +44,36 @@ public class LetterInteractLastDay : MonoBehaviour
 
             if (Input.GetKeyDown(KeyCode.F) && cast && hit.collider.gameObject.GetComponent(_letterTagComponent))
             {
-                BoxCollider boxCollider = GetComponent<BoxCollider>();
-                boxCollider.enabled = false;
+                //BoxCollider boxCollider = GetComponent<BoxCollider>();
+                //boxCollider.enabled = false;
 
-                PlayerInteractionsController.globalVariableForInteractionLetters += 1;
-                if (PlayerInteractionsController.globalVariableForInteractionLetters == 1)
+                if (!soundPlayed)
                 {
-                    doorSound.Play();
+                    PlayerInteractionsController.globalVariableForInteractionLetters += 1;
+                    if (PlayerInteractionsController.globalVariableForInteractionLetters == 1)
+                    {
+                        doorSound.Play();
 
-                    if (barnDoor._isOpen == false)
-                    {
-                        barnDoor._isLocked = true;
+                        if (barnDoor._isOpen == false)
+                        {
+                            barnDoor._isLocked = true;
+                        }
+                        else
+                        {
+                            barnDoor.CloseDoor();
+                            barnDoor._isLocked = true;
+                        }
                     }
-                    else
+                    otherSound.Stop();
+                    otherText.SetActive(false);
+                    playSound.Play();
+                    StartCoroutine(PlaySubtitle());
+                    if (PlayerInteractionsController.globalVariableForInteractionLetters >= 2)
                     {
-                        barnDoor.CloseDoor();
-                        barnDoor._isLocked = true;
+                        ghostInteract.SetActive(true);
                     }
-                }
-                otherSound.Stop();
-                otherText.SetActive(false);
-                playSound.Play();
-                StartCoroutine(PlaySubtitle());
-                if (PlayerInteractionsController.globalVariableForInteractionLetters >= 2)
-                {
-                    ghostInteract.SetActive(true);
+
+                    soundPlayed = true;
                 }
             }
         }

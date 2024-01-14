@@ -15,6 +15,8 @@ public class HidingPlaceController : MonoBehaviour
     private EnemyController _enemyController;
     private string _hidingPlaceTag;
 
+    private int layerMask = ~(1 << 1);
+
     private void Start()
     {
         _isHiding = false;
@@ -26,7 +28,7 @@ public class HidingPlaceController : MonoBehaviour
     private void Update()
     {
         RaycastHit hit;
-        bool cast = Physics.Raycast(_playerController.playerHead.position, _playerController.playerHead.forward, out hit, maxInteractDistance);     
+        bool cast = Physics.Raycast(_playerController.playerHead.position, _playerController.playerHead.forward, out hit, maxInteractDistance, layerMask);     
 
         if (Input.GetKeyDown(KeyCode.F) && cast && hit.collider.gameObject.GetComponent(_hidingPlaceTag))
         {                  

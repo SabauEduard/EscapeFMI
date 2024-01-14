@@ -27,6 +27,8 @@ public class PlayerInteractionsController : MonoBehaviour
 
     public static int globalVariableForInteractionDesk = 0;
 
+    private int layerMask = ~(1 << 1);
+
     public void DisableTexts()
     {
         pickUpText.GetComponent<TMP_Text>().enabled = false;
@@ -38,7 +40,7 @@ public class PlayerInteractionsController : MonoBehaviour
     void Update()
     {
         RaycastHit hit;
-        bool cast = Physics.Raycast(playerHead.position, playerHead.forward, out hit, itemPickupDistance);
+        bool cast = Physics.Raycast(playerHead.position, playerHead.forward, out hit, itemPickupDistance, layerMask);
 
         if (cast && hit.collider.gameObject.GetComponent<InteractableObjectTag>())  // hovering interactable object
         {

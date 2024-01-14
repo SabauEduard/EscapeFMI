@@ -24,6 +24,9 @@ public class LetterInteract : MonoBehaviour
 
     [SerializeField]
     public float maxInteractDistance = 5.0f;
+
+    private int layerMask = ~(1 << 1);
+
     private void Start()
     {
         _player = FindObjectOfType<PlayerInteractionsController>();
@@ -36,7 +39,7 @@ public class LetterInteract : MonoBehaviour
         if (!playSound.isPlaying)
         {
             RaycastHit hit;
-            bool cast = Physics.Raycast(_player.playerHead.position, _player.playerHead.forward, out hit, maxInteractDistance);
+            bool cast = Physics.Raycast(_player.playerHead.position, _player.playerHead.forward, out hit, maxInteractDistance, layerMask);
 
             if (Input.GetKeyDown(KeyCode.F) && cast && hit.collider.gameObject.GetComponent(_letterTagComponent))
             {

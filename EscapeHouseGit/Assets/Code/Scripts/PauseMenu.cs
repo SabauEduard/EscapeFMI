@@ -46,7 +46,7 @@ public class PauseMenu : MonoBehaviour
         Time.timeScale = 1f;
         paused = false;
         player.GetComponent<FirstPersonController>().enabled = true;
-        player.GetComponent<StarterAssetsInputs>().jump = true;
+        player.GetComponent<StarterAssetsInputs>().jump = false;
         player.GetComponent<StarterAssetsInputs>().jumpAudio.enabled = true;
     }
 

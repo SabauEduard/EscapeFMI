@@ -25,6 +25,8 @@ public class PlayerInteractionsController : MonoBehaviour
 
     public static int globalVariableForInteractionLetters = 0;
 
+    public static int globalVariableForInteractionDesk = 0;
+
     public void DisableTexts()
     {
         pickUpText.GetComponent<TMP_Text>().enabled = false;

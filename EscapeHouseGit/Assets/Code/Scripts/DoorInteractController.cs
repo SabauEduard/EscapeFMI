@@ -65,7 +65,7 @@ public class DoorInteractController : MonoBehaviour
         }
     }
 
-    void CloseDoor()
+    public void CloseDoor()
     {
         _usedKeys.Clear();
         _isOpen = false;

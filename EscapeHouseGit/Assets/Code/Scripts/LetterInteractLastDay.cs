@@ -41,6 +41,7 @@ public class LetterInteractLastDay : MonoBehaviour
             {
                 BoxCollider boxCollider = GetComponent<BoxCollider>();
                 boxCollider.enabled = false;
+
                 PlayerInteractionsController.globalVariableForInteractionLetters += 1;
                 if (PlayerInteractionsController.globalVariableForInteractionLetters == 1)
                 {
@@ -52,8 +53,7 @@ public class LetterInteractLastDay : MonoBehaviour
                     }
                     else
                     {
-                        StartCoroutine(barnDoor.RotateDoor(transform.eulerAngles.y - 90, 1.0f));
-                        barnDoor._isOpen = false;
+                        barnDoor.CloseDoor();
                         barnDoor._isLocked = true;
                     }
                 }

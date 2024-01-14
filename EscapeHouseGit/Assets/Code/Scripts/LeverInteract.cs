@@ -13,6 +13,11 @@ public class LeverInteract : MonoBehaviour
     public GameObject DoorBarn;
     DoorInteractController barnDoor;
 
+    public AudioSource whispersSound;
+
+    [SerializeField]
+    public Transform noahDoor;
+
     public GameObject leverObject;
 
     [SerializeField]
@@ -22,6 +27,7 @@ public class LeverInteract : MonoBehaviour
         _player = FindObjectOfType<PlayerInteractionsController>();
         _letterTagComponent = "LeverTagInstance";
         barnDoor = DoorBarn.GetComponent<DoorInteractController>();
+
     }
     void Update()
     {
@@ -37,7 +43,8 @@ public class LeverInteract : MonoBehaviour
             transform.Rotate(rotationToAdd);
 
             barnDoor._isLocked = false;
-            barnDoor._isOpen = true;
+            noahDoor.GetComponent<DoorInteractController>()._isLocked = false;
+            whispersSound.enabled = true;
 
             doorSound.Play();
         }

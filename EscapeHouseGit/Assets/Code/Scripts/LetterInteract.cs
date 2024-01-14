@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class LetterInteract : MonoBehaviour
 {
+    [SerializeField]
+    public Transform secondPuzzleDoor;
     public List<int> _usedKeys = new List<int>();
 
     private PlayerInteractionsController _player = null;
@@ -12,12 +14,21 @@ public class LetterInteract : MonoBehaviour
     public AudioSource playSound;
     public GameObject textbox;
 
+    public AudioSource otherSound;
+    public GameObject otherText;
+
+    public GameObject DoorUniversity;
+    DoorInteractController universityDoor;
+
+    public GameObject sprinklerHintTrigger;
+
     [SerializeField]
     public float maxInteractDistance = 5.0f;
     private void Start()
     {
         _player = FindObjectOfType<PlayerInteractionsController>();
         _letterTagComponent = "LetterTag";
+        universityDoor = DoorUniversity.GetComponent<DoorInteractController>();
     }
 
     void Update()
@@ -29,8 +40,21 @@ public class LetterInteract : MonoBehaviour
 
             if (Input.GetKeyDown(KeyCode.F) && cast && hit.collider.gameObject.GetComponent(_letterTagComponent))
             {
+                PlayerInteractionsController.globalVariableForInteractionDesk += 1;
+                if (PlayerInteractionsController.globalVariableForInteractionDesk == 2)
+                {
+                    universityDoor._isLocked = false;
+                    secondPuzzleDoor.GetComponent<DoorInteractController>()._isLocked = false;
+                }
+                if (otherSound.isPlaying)
+                {
+                    otherSound.enabled = false;
+                    otherText.SetActive(false);
+                }
                 playSound.Play();
                 StartCoroutine(PlaySubtitle());
+                BoxCollider boxCollider = GetComponent<BoxCollider>();
+                boxCollider.enabled = false;
             }
         }
 
@@ -39,6 +63,7 @@ public class LetterInteract : MonoBehaviour
             textbox.SetActive(true);
             yield return new WaitForSeconds(30);
             textbox.SetActive(false);
+            sprinklerHintTrigger.SetActive(true);
         }
     }
 }

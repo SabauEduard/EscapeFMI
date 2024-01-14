@@ -14,6 +14,7 @@ public class FinalCutSceneScript : MonoBehaviour
     public bool triggered = false;
 
     public GameObject cutSceneCamera;
+    public GameObject finalCutSceneCamera;
 
     public AudioSource lookHowSleepsSound;
     public GameObject lookHowSleepsCanvas;

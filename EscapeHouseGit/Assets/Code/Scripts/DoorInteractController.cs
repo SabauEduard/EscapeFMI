@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -33,6 +34,7 @@ public class DoorInteractController : MonoBehaviour
     [SerializeField]
     private AudioSource _doorOpenWithCreakSound = null;
 
+    private int layerMask = ~(1 << 1);
 
     private void Start()
     {
@@ -43,7 +45,7 @@ public class DoorInteractController : MonoBehaviour
     void Update()
     {
         RaycastHit hit;
-        bool cast = Physics.Raycast(_player.playerHead.position, _player.playerHead.forward, out hit, maxInteractDistance);
+        bool cast = Physics.Raycast(_player.playerHead.position, _player.playerHead.forward, out hit, maxInteractDistance, layerMask);
 
         if (Input.GetKeyDown(KeyCode.F) && cast && hit.collider.gameObject.GetComponent(_doorTagComponent) && !_isAnimating)
         {
@@ -64,7 +66,7 @@ public class DoorInteractController : MonoBehaviour
         }
     }
 
-    void CloseDoor()
+    public void CloseDoor()
     {
         _usedKeys.Clear();
         _isOpen = false;
@@ -127,7 +129,7 @@ public class DoorInteractController : MonoBehaviour
 
     }
 
-    IEnumerator RotateDoor(float targetAngle, float rotationDuration)
+    public IEnumerator RotateDoor(float targetAngle, float rotationDuration)
     {
         float currentAngle = transform.eulerAngles.y;
         float elapsedRotationTime = 0f;       
@@ -145,4 +147,5 @@ public class DoorInteractController : MonoBehaviour
         transform.eulerAngles = new Vector3(0, targetAngle, 0);
         _isAnimating = false;
     }
+
 }

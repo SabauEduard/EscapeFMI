@@ -2,11 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using System;
 
 public class PlayerInteractionsController : MonoBehaviour
 {
     public Transform playerHead;
     public Transform playerHand;
+    public Transform playerInFront;
 
     public TextMeshProUGUI pickUpText;
     public TextMeshProUGUI interactText;
@@ -19,9 +21,16 @@ public class PlayerInteractionsController : MonoBehaviour
     private Transform pickedItem = null;
     private Vector3 initialPosition;     // initial position of held item
     private Quaternion initialRotation;   // initial rotation of held item
+    private Vector3 initialScale;
     private Transform initialParent = null;          // initial parent of held item
 
     private Transform targetedItem = null;
+
+    public static int globalVariableForInteractionLetters = 0;
+
+    public static int globalVariableForInteractionDesk = 0;
+
+    private int layerMask = ~(1 << 1);
 
     public void DisableTexts()
     {
@@ -34,13 +43,14 @@ public class PlayerInteractionsController : MonoBehaviour
     void Update()
     {
         RaycastHit hit;
-        bool cast = Physics.Raycast(playerHead.position, playerHead.forward, out hit, itemPickupDistance);
+        bool cast = Physics.Raycast(playerHead.position, playerHead.forward, out hit, itemPickupDistance, layerMask);
 
         if (cast && hit.collider.gameObject.GetComponent<InteractableObjectTag>())  // hovering interactable object
         {
             if(targetedItem != null && targetedItem != hit.transform && targetedItem.GetComponent<Outline>() != null)   // exit hovering previous interactable object
                 targetedItem.GetComponent<Outline>().enabled = false;
-            targetedItem = hit.transform;      
+
+            targetedItem = hit.transform;
 
             if (hit.transform.GetComponent<Outline>() != null) // if interactable object has outline script
             {
@@ -65,21 +75,17 @@ public class PlayerInteractionsController : MonoBehaviour
                 else // text for any other interactable
                     interactText.GetComponent<TMP_Text>().enabled = true;
             }
-                
-
         }
         else if (targetedItem != null)  
         {
-            DisableTexts();         
+            DisableTexts();
             if (targetedItem.GetComponent<Outline>() != null)
                 targetedItem.GetComponent<Outline>().enabled = false;
         }
 
-
-
         if (Input.GetKeyDown(KeyCode.F))    
         {
-            if (pickedItem != null) 
+            if (pickedItem != null)
             {
                 if (pickedItem.GetComponent<KeyTag>() != null)
                 {
@@ -91,7 +97,16 @@ public class PlayerInteractionsController : MonoBehaviour
                         pickedItem.rotation = initialRotation;
                         pickedItem = null;
                         DisableTexts();
-                    }               
+                    }
+                }
+                else if (pickedItem.GetComponent<PickableObjectTag>() != null)
+                {
+                    pickedItem.SetParent(initialParent);
+                    pickedItem.position = initialPosition;
+                    pickedItem.rotation = initialRotation;
+                    pickedItem.localScale = initialScale;
+                    pickedItem = null;
+                    DisableTexts();
                 }
                 else
                 {
@@ -101,9 +116,8 @@ public class PlayerInteractionsController : MonoBehaviour
             }
             else if (cast)  // try picking item up
             {
-                if (hit.collider.gameObject.GetComponent<PickableObjectTag>())
+                if (hit.collider.gameObject.GetComponent<KeyTag>())
                 {
-
                     pickedItem = hit.transform;
                     initialPosition = pickedItem.position;      // save initial state
                     initialRotation = pickedItem.rotation;
@@ -114,6 +128,40 @@ public class PlayerInteractionsController : MonoBehaviour
                     pickedItem.SetParent(playerHand);         // ALTERNATIVE: setParent(camera) to follow camera
                     pickedItem.position = playerHand.position;
                     pickedItem.rotation = Quaternion.Euler(playerHand.rotation.eulerAngles + new Vector3(0f, -15f, 90f));   // align to hand + offset so object is facing forward
+                    DisableTexts();
+                }
+                else if (hit.collider.gameObject.GetComponent<HintTag>()
+                    || hit.collider.gameObject.GetComponent<LetterTag>()
+                    || hit.collider.gameObject.GetComponent<LetterTagDontSafe>()
+                    || hit.collider.gameObject.GetComponent<LetterTagLastDay>()
+                    || hit.collider.gameObject.GetComponent<MapTag>())
+                {
+                    pickedItem = hit.transform;
+                    initialPosition = pickedItem.position;      // save initial state
+                    initialRotation = pickedItem.rotation;
+                    initialScale = pickedItem.localScale;
+                    initialParent = hit.transform.parent;
+
+                    Debug.Log(initialScale);
+
+                    pickedItem.SetParent(playerInFront);
+                    pickedItem.position = playerInFront.position + new Vector3(0f, 0f, 0f);
+                    
+                    if (hit.collider.gameObject.GetComponent<HintTag>())
+                        pickedItem.rotation = Quaternion.Euler(playerInFront.rotation.eulerAngles + new Vector3(180f, 0f, 180f));   // align to camera + offset so object is facing camera
+                    
+                    if (hit.collider.gameObject.GetComponent<LetterTag>())
+                        pickedItem.rotation = Quaternion.Euler(playerInFront.rotation.eulerAngles + new Vector3(180f, 0f, 0f));
+
+                    if (hit.collider.gameObject.GetComponent<LetterTagDontSafe>())
+                        pickedItem.rotation = Quaternion.Euler(playerInFront.rotation.eulerAngles + new Vector3(180f, 0f, -90f));
+
+                    if (hit.collider.gameObject.GetComponent<LetterTagLastDay>())
+                        pickedItem.rotation = Quaternion.Euler(playerInFront.rotation.eulerAngles + new Vector3(180f, 0f, -90f));
+
+                    if (hit.collider.gameObject.GetComponent<MapTag>())
+                        pickedItem.rotation = Quaternion.Euler(playerInFront.rotation.eulerAngles + new Vector3(180f, 0f, -90f));
+
                     DisableTexts();
                 }
             }

@@ -38,6 +38,7 @@ public class PauseMenu : MonoBehaviour
         paused = true;
         player.GetComponent<FirstPersonController>().enabled = false;
         player.GetComponent<StarterAssetsInputs>().jump = false;
+        player.GetComponent<StarterAssetsInputs>().jumpAudio.enabled = false;
     }
     public void Play()
     {
@@ -46,6 +47,7 @@ public class PauseMenu : MonoBehaviour
         paused = false;
         player.GetComponent<FirstPersonController>().enabled = true;
         player.GetComponent<StarterAssetsInputs>().jump = false;
+        player.GetComponent<StarterAssetsInputs>().jumpAudio.enabled = true;
     }
 
     public void MainMenuButton()

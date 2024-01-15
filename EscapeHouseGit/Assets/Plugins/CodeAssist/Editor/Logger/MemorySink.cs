@@ -4,7 +4,6 @@ using System.IO;
 using System.Text;
 using Serilog.Core;
 using Serilog.Events;
-using Serilog.Formatting;
 
 
 #nullable enable

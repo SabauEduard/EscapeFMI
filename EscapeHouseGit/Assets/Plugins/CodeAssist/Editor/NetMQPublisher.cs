@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.IO;
 using UnityEngine;
-using UnityEditor;
 using NetMQ;
 using NetMQ.Sockets;
 using System.Threading;

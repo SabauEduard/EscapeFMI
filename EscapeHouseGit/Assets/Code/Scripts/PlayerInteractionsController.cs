@@ -18,11 +18,11 @@ public class PlayerInteractionsController : MonoBehaviour
     [SerializeField]
     private float itemPickupDistance = 5f;
 
-    private Transform pickedItem = null;
-    private Vector3 initialPosition;     // initial position of held item
-    private Quaternion initialRotation;   // initial rotation of held item
-    private Vector3 initialScale;
-    private Transform initialParent = null;          // initial parent of held item
+    public Transform pickedItem = null;
+    public Vector3 initialPosition;     // initial position of held item
+    public Quaternion initialRotation;   // initial rotation of held item
+    public Vector3 initialScale;
+    public Transform initialParent = null;          // initial parent of held item
 
     private Transform targetedItem = null;
 

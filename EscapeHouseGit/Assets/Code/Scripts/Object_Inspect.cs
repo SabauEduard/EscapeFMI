@@ -1,10 +1,6 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.Net.NetworkInformation;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.UIElements;
 using Cursor = UnityEngine.Cursor;
 
 public class Object_Inspect : MonoBehaviour
